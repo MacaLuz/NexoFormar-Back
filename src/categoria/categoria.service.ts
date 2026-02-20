@@ -7,8 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Categoria } from './entities/categoria.entity';
-import { UpdateCategoriaDto } from './dto/updateCatDto';
-import { CreateCategoriaDto } from './dto/createCatDto';
+import { UpdateCategoriaDto } from './dto/update-categoria.dto';
+import { CreateCategoriaDto } from './dto/create-categoria.dto';
 
 @Injectable()
 export class CategoriaService {
