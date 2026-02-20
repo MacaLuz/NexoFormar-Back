@@ -18,16 +18,30 @@ import { UsuarioModule } from './usuario/usuario.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST'),
-        port: Number(config.get<string>('DB_PORT')),
-        username: config.get<string>('DB_USERNAME'),
-        password: config.get<string>('DB_PASSWORD'),
-        database: config.get<string>('DB_NAME'),
-        autoLoadEntities: true, 
-        synchronize: true,
-      }),
+      useFactory: (config: ConfigService) => {
+        const databaseUrl = config.get<string>('DATABASE_URL');
+
+        if (databaseUrl) {
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            ssl: { rejectUnauthorized: false },
+            autoLoadEntities: true,
+            synchronize: true,
+          };
+        }
+
+        return {
+          type: 'postgres',
+          host: config.get<string>('DB_HOST'),
+          port: Number(config.get<string>('DB_PORT')),
+          username: config.get<string>('DB_USERNAME'),
+          password: config.get<string>('DB_PASSWORD'),
+          database: config.get<string>('DB_NAME'),
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
     }),
 
     UsuarioModule,

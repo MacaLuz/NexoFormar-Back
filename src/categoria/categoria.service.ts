@@ -17,27 +17,32 @@ export class CategoriaService {
     private categoriaRepo: Repository<Categoria>,
   ) {}
 
-  create(dto: CreateCategoriaDto) {
-    const nueva = this.categoriaRepo.create(dto);
+  async create(dto: CreateCategoriaDto) {
+    const nombre = dto?.nombre?.trim();
+    if (!nombre) throw new BadRequestException('El nombre es obligatorio');
+
+    const nueva = this.categoriaRepo.create({ nombre });
     return this.categoriaRepo.save(nueva);
   }
 
   findAll() {
-    return this.categoriaRepo.find();
+    return this.categoriaRepo.find({ order: { id: 'ASC' } });
   }
 
-  findOne(id: number) {
-    return this.categoriaRepo.findOneBy({ id });
+  async findOne(id: number) {
+    const cat = await this.categoriaRepo.findOneBy({ id });
+    if (!cat) throw new NotFoundException('Categoría no encontrada');
+    return cat;
   }
 
   async update(id: number, dto: UpdateCategoriaDto) {
+    await this.findOne(id); 
     await this.categoriaRepo.update(id, dto);
     return this.findOne(id);
   }
 
   async remove(id: number) {
     const categoria = await this.findOne(id);
-    if (!categoria) throw new NotFoundException('Categoría no encontrada');
 
     try {
       return await this.categoriaRepo.remove(categoria);
@@ -47,6 +52,7 @@ export class CategoriaService {
           'No se puede eliminar la categoría porque tiene cursos asociados.',
         );
       }
+
       console.error('Error inesperado al eliminar categoría:', error);
       throw new InternalServerErrorException(
         'Error inesperado al eliminar la categoría.',

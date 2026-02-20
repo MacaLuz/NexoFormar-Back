@@ -27,11 +27,11 @@ export class MailService {
     await this.transporter.sendMail({
       from,
       to,
-      subject: 'Código de recuperación de contraseña',
+      subject: 'Código de verificación - NexoFormar',
       html: `
         <div style="font-family: Arial, sans-serif;">
-          <h2>Recuperación de contraseña</h2>
-          <p>Tu código de recuperación es:</p>
+          <h2>Verificación por código</h2>
+          <p>Tu código de verificación es:</p>
           <h1 style="letter-spacing: 4px;">${code}</h1>
           <p>Este código vence en 15 minutos.</p>
         </div>

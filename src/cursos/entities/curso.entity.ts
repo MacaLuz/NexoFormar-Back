@@ -28,7 +28,11 @@ export class Curso {
   @Column({ type: 'text', array: true, nullable: true })
   imagenes: string[];
 
-  @CreateDateColumn({ name: 'fecha_publicacion' })
+  @CreateDateColumn({
+    name: 'fecha_publicacion',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   fechaPublicacion: Date;
 
   @ManyToOne(() => Categoria)

@@ -7,13 +7,26 @@ import { LoginDto } from './dto/login.dto';
 import { RecoveryDto } from './dto/recovery.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
+import { RequestRegisterCodeDto } from './dto/request-register-code.dto';
+import { ConfirmRegisterDto } from './dto/confirm-register.dto';
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterDto) {
+  register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
+  }
+
+  @Post('register/request-code')
+  requestRegisterCode(@Body() dto: RequestRegisterCodeDto) {
+    return this.authService.generarCodigoRegistro(dto.correo);
+  }
+
+  @Post('register/confirm')
+  confirmRegister(@Body() dto: ConfirmRegisterDto) {
+    return this.authService.confirmarRegistroConCodigo(dto);
   }
 
   @Post('login')
@@ -29,12 +42,12 @@ export class AuthController {
   }
 
   @Post('recovery')
-  async solicitarCodigo(@Body() dto: RecoveryDto) {
+  solicitarCodigo(@Body() dto: RecoveryDto) {
     return this.authService.generarCodigoRecuperacion(dto.correo);
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() dto: ResetPasswordDto) {
+  resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.cambiarPasswordConCodigo(
       dto.correo,
       dto.codigo,

@@ -13,6 +13,11 @@ import { Categoria } from 'src/categoria/entities/categoria.entity';
 import { CreateCursoDto } from './dto/createCursoDto';
 import { UpdateCursoDto } from './dto/updateCursoDto';
 
+function clampInt(n: number, min: number, max: number) {
+  if (Number.isNaN(n)) return min;
+  return Math.max(min, Math.min(max, n));
+}
+
 @Injectable()
 export class CursosService {
   constructor(
@@ -50,6 +55,27 @@ export class CursosService {
     });
 
     return this.cursoRepo.save(nuevoCurso);
+  }
+
+  async findAllPaginado(opts: { page: number; limit: number }) {
+    const page = clampInt(opts.page || 1, 1, 999999);
+    const limit = clampInt(opts.limit || 20, 1, 50); // 50 max para evitar abuso
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.cursoRepo.findAndCount({
+      relations: ['usuario', 'categoria'],
+      order: { fechaPublicacion: 'DESC' },
+      take: limit,
+      skip,
+    });
+
+    return {
+      data,
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    };
   }
 
   async findAll() {
@@ -138,6 +164,56 @@ export class CursosService {
     }
 
     return this.update(id, dto);
+  }
+
+  async buscarPersonalizadoPaginado(filtro: {
+    categoriaId?: string;
+    texto?: string;
+    page: number;
+    limit: number;
+  }) {
+    const page = clampInt(filtro.page || 1, 1, 999999);
+    const limit = clampInt(filtro.limit || 20, 1, 50);
+    const skip = (page - 1) * limit;
+
+    const query = this.cursoRepo
+      .createQueryBuilder('curso')
+      .leftJoinAndSelect('curso.usuario', 'usuario')
+      .leftJoinAndSelect('curso.categoria', 'categoria')
+      .orderBy('curso.fechaPublicacion', 'DESC')
+      .take(limit)
+      .skip(skip);
+
+    if (filtro.categoriaId) {
+      const categoriaIds = filtro.categoriaId
+        .split(',')
+        .map((id) => parseInt(id.trim(), 10))
+        .filter((id) => !isNaN(id));
+
+      if (categoriaIds.length > 0) {
+        query.andWhere('categoria.id IN (:...categoriaIds)', {
+          categoriaIds,
+        });
+      }
+    }
+    if (filtro.texto) {
+      const texto = `%${filtro.texto.trim()}%`;
+
+      query.andWhere(
+        '(curso.titulo ILIKE :texto OR curso.descripcion ILIKE :texto)',
+        { texto },
+      );
+    }
+
+    const [data, total] = await query.getManyAndCount();
+
+    return {
+      data,
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    };
   }
 
   async buscarPersonalizado(filtro: { categoriaId?: string; texto?: string }) {

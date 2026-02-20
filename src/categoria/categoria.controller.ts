@@ -6,16 +6,21 @@ import {
   Param,
   Delete,
   Put,
-  BadRequestException,
+  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoriaService } from './categoria.service';
 import { UpdateCategoriaDto } from './dto/updateCatDto';
 import { CreateCategoriaDto } from './dto/createCatDto';
 
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+
 @Controller('categorias')
 export class CategoriaController {
   constructor(private readonly categoriaService: CategoriaService) {}
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   create(@Body() dto: CreateCategoriaDto) {
     return this.categoriaService.create(dto);
@@ -27,23 +32,22 @@ export class CategoriaController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoriaService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriaService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCategoriaDto) {
-    return this.categoriaService.update(+id, dto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCategoriaDto,
+  ) {
+    return this.categoriaService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    try {
-      return await this.categoriaService.remove(+id);
-    } catch (error) {
-      throw new BadRequestException(
-        'No se puede eliminar la categoría porque tiene cursos asociados.',
-      );
-    }
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriaService.remove(id);
   }
 }

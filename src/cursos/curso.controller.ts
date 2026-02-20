@@ -47,10 +47,14 @@ export class CursosController {
   buscar(
     @Query('categoria_id') categoriaId?: string,
     @Query('keywords') busqueda?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
-    return this.cursosService.buscarPersonalizado({
+    return this.cursosService.buscarPersonalizadoPaginado({
       categoriaId,
       texto: busqueda?.toLowerCase(),
+      page: page ? parseInt(page, 10) : 1,
+      limit: limit ? parseInt(limit, 10) : 20,
     });
   }
 
@@ -58,10 +62,16 @@ export class CursosController {
   findAll(
     @Query('categoria_id') categoriaId?: string,
     @Query('usuario_id') usuarioId?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
     if (usuarioId) return this.cursosService.buscarPorUsuario(+usuarioId);
     if (categoriaId) return this.cursosService.buscarPorCategoria(+categoriaId);
-    return this.cursosService.findAll();
+
+    return this.cursosService.findAllPaginado({
+      page: page ? parseInt(page, 10) : 1,
+      limit: limit ? parseInt(limit, 10) : 20,
+    });
   }
 
   @Get(':id')
