@@ -18,17 +18,34 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.enableCors({
-    origin: process.env.FRONT_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        process.env.FRONT_URL,
+        'http://localhost:3000',
+      ].filter(Boolean) as string[];
+
+      const isVercelPreview =
+        origin.endsWith('.vercel.app') &&
+        origin.includes('nexoformar-front-vercel');
+
+      if (allowedOrigins.includes(origin) || isVercelPreview) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`Not allowed by CORS: ${origin}`), false);
+    },
     credentials: true,
   });
 
   const config = new DocumentBuilder()
-    .setTitle('API para la aplicación de trueque')
+    .setTitle('API para la aplicación de NexoFormar')
     .setDescription(
-      'Esta es una API diseñada por el grupo 1 de la materia programacion III, la cual es utilizada y consumida por nuestra aplicacion frontend',
+      'Esta es una API diseñada por Macarena Cobuzzi y Matias Fredes para el CUVL',
     )
     .setVersion('1.0')
-    .addTag('trueque')
+    .addTag('nexoformar')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
