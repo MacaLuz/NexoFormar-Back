@@ -9,7 +9,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 
-import { UsuarioModule } from 'src/usuario/usuario.module';
+import { UsuarioModule } from '../usuario/usuario.module';
 import { MailModule } from '../mail/mail.module';
 import { RecoveryCode } from '../codigoRecuperacion/entities/codigo.entity';
 

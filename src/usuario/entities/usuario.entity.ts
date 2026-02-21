@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Curso } from 'src/cursos/entities/curso.entity';
+import { Curso } from '../../cursos/entities/curso.entity';
 import { Exclude } from 'class-transformer';
 
 export enum RolUsuario {

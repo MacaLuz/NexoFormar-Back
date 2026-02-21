@@ -11,11 +11,11 @@ import {
 } from '@nestjs/common';
 
 import { UsuarioService } from './usuario.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UpdatePerfilDto } from './dto/updatePerfilDto';
 import { UpdatePasswordDto } from './dto/updatePasswordDto';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { EstadoUsuario, RolUsuario } from './entities/usuario.entity';
 
 @Controller('usuarios')

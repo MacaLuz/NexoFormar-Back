@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Curso } from './entities/curso.entity';
-import { Usuario } from 'src/usuario/entities/usuario.entity';
-import { Categoria } from 'src/categoria/entities/categoria.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
+import { Categoria } from '../categoria/entities/categoria.entity';
 
 import { CreateCursoDto } from './dto/createCursoDto';
 import { UpdateCursoDto } from './dto/updateCursoDto';
@@ -59,7 +59,7 @@ export class CursosService {
 
   async findAllPaginado(opts: { page: number; limit: number }) {
     const page = clampInt(opts.page || 1, 1, 999999);
-    const limit = clampInt(opts.limit || 20, 1, 50); // 50 max para evitar abuso
+    const limit = clampInt(opts.limit || 20, 1, 50); 
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.cursoRepo.findAndCount({

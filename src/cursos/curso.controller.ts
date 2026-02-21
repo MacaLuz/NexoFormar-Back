@@ -16,7 +16,7 @@ import { Request } from 'express';
 import { CursosService } from './curso.service';
 import { CreateCursoDto } from './dto/createCursoDto';
 import { UpdateCursoDto } from './dto/updateCursoDto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 type JwtReqUser = {
   id: number;

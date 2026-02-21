@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import type { RolUsuario } from 'src/usuario/entities/usuario.entity';
+import type { RolUsuario } from '../../usuario/entities/usuario.entity';
 
 export type JwtUser = {
   id: number;

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Curso } from 'src/cursos/entities/curso.entity';
+import { Curso } from '../../cursos/entities/curso.entity';
 
 @Entity('categorias')
 export class Categoria {

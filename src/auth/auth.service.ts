@@ -9,11 +9,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
-import { UsuarioService } from 'src/usuario/usuario.service';
+import { UsuarioService } from '../usuario/usuario.service';
 import { RecoveryCode } from '../codigoRecuperacion/entities/codigo.entity';
 import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
-import { EstadoUsuario, RolUsuario } from 'src/usuario/entities/usuario.entity';
+import { EstadoUsuario, RolUsuario } from '../usuario/entities/usuario.entity';
 
 type JwtUserPayload = {
   id: number;

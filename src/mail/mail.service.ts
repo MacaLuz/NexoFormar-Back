@@ -1,30 +1,27 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class MailService {
-  private readonly logger = new Logger(MailService.name);
-  private transporter: nodemailer.Transporter;
+  private readonly resend: Resend;
 
   constructor(private readonly config: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: this.config.get<string>('MAIL_HOST'),
-      port: Number(this.config.get<string>('MAIL_PORT')),
-      secure: false,
-      auth: {
-        user: this.config.get<string>('MAIL_USER'),
-        pass: this.config.get<string>('MAIL_PASS'),
-      },
-    });
+    const apiKey = this.config.get<string>('RESEND_API_KEY');
+
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY no está configurada');
+    }
+
+    this.resend = new Resend(apiKey);
   }
 
-  async sendRecoveryCode(to: string, code: string) {
+  async sendRecoveryCode(to: string, code: string): Promise<void> {
     const from =
       this.config.get<string>('MAIL_FROM') ||
-      this.config.get<string>('MAIL_USER');
+      'NexoFormar <onboarding@resend.dev>';
 
-    await this.transporter.sendMail({
+    const result = await this.resend.emails.send({
       from,
       to,
       subject: 'Código de verificación - NexoFormar',
@@ -38,6 +35,12 @@ export class MailService {
       `,
     });
 
-    this.logger.log(`Código de recuperación enviado a ${to}`);
+    const anyResult: any = result as any;
+
+    if (anyResult?.error) {
+      throw new Error(
+        anyResult.error.message || 'Error al enviar el correo con Resend',
+      );
+    }
   }
 }
