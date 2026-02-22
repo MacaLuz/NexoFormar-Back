@@ -5,11 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
 
 import { Usuario, EstadoUsuario, RolUsuario } from './entities/usuario.entity';
 import { UpdatePerfilDto } from './dto/updatePerfilDto';
-import { UpdatePasswordDto } from './dto/updatePasswordDto';
 
 @Injectable()
 export class UsuarioService {
@@ -17,7 +15,6 @@ export class UsuarioService {
     @InjectRepository(Usuario)
     private usuarioRepo: Repository<Usuario>,
   ) {}
-
 
   async getMe(userId: number) {
     const user = await this.usuarioRepo.findOne({
@@ -62,24 +59,6 @@ export class UsuarioService {
     return updated;
   }
 
-  async updateMyPassword(userId: number, dto: UpdatePasswordDto) {
-    const user = await this.usuarioRepo.findOne({
-      where: { id: userId },
-      select: ['id', 'password'],
-    });
-    if (!user) throw new NotFoundException('Usuario no encontrado');
-
-    const ok = await bcrypt.compare(dto.passwordActual, user.password);
-    if (!ok)
-      throw new BadRequestException('La contraseña actual no es correcta');
-
-    user.password = await bcrypt.hash(dto.passwordNueva, 10);
-    await this.usuarioRepo.save(user);
-
-    return { message: 'Contraseña actualizada correctamente' };
-  }
-
-
   async findByEmail(correo: string) {
     return this.usuarioRepo.findOne({ where: { correo } });
   }
@@ -100,7 +79,6 @@ export class UsuarioService {
     user.password = passwordHash;
     return this.usuarioRepo.save(user);
   }
-
 
   async findAll() {
     return this.usuarioRepo.find({
